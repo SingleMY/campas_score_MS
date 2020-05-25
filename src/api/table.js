@@ -7,3 +7,11 @@ export function getList(params) {
     params
   })
 }
+
+export function getScoreApplyList(params) {
+  return request({
+    url: '/score/applylist',
+    method: 'get',
+    params
+  })
+}

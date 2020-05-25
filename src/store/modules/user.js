@@ -5,6 +5,7 @@ import { resetRouter } from '@/router'
 const getDefaultState = () => {
   return {
     token: getToken(),
+    id: '',
     name: '',
     avatar: ''
   }
@@ -19,8 +20,11 @@ const mutations = {
   SET_TOKEN: (state, token) => {
     state.token = token
   },
-  SET_NAME: (state, name) => {
-    state.name = name
+  SET_ID: (state, admin_id) => {
+    state.id = admin_id
+  },
+  SET_NAME: (state, admin_username) => {
+    state.name = admin_username
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
@@ -53,10 +57,11 @@ const actions = {
           reject('Verification failed, please Login again.')
         }
 
-        const { name, avatar } = data
+        const { admin_id, admin_username } = data
 
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
+        commit('SET_ID', admin_id)
+        commit('SET_NAME', admin_username)
+        // commit('SET_AVATAR', avatar)
         resolve(data)
       }).catch(error => {
         reject(error)
