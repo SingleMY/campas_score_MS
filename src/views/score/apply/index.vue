@@ -1,7 +1,6 @@
 <template>
   <div class="app-container">
     <div class="search-box">
-
       <div style="display:inline-block ;">
         <label style="font-family:verdana;font-size:80%;margin-right:10px">时间范围：</label>
         <el-date-picker
@@ -22,14 +21,14 @@
             <el-option label="活动" value="activity_id" />
             <el-option label="完成情况" value="finish_case" />
           </el-select>
-          <el-button slot="append" type="primary" icon="el-icon-search" @click="SearchList()" />
+          <el-button slot="append" type="primary" icon="el-icon-search" @click="SearchList(dateTimeRange,search,select)" />
         </el-input>
       </div>
     </div>
     <el-divider />
     <el-table
       v-loading="listLoading"
-      :data="list.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+      :data="searchList.slice((currentPage-1)*pageSize,currentPage*pageSize)"
       :row-class-name="tableRowClassName"
       :default-sort="{prop: 'application_time', order: 'descending'}"
       element-loading-text="Loading"
@@ -38,30 +37,30 @@
       highlight-current-row
     >
       <el-table-column align="center" label="ID" width="80">
-        <template slot-scope="scope">
-          {{ scope.$index+1 }}
-        </template>
+        <template slot-scope="scope">{{ scope.$index+1 }}</template>
       </el-table-column>
       <el-table-column label="申请人" width="200" align="center" :sortable="true" prop="user_id">
-        <template slot-scope="scope">
-          {{ scope.row.user_id }}
-        </template>
+        <template slot-scope="scope">{{ scope.row.user_id }}</template>
       </el-table-column>
       <el-table-column label="活动ID" align="center" width="240" :sortable="true" prop="activity_id">
         <template slot-scope="scope">
           <span>{{ scope.row.activity_id }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="申请时间" width="240" :sortable="true" prop="application_time">
+      <el-table-column
+        align="center"
+        label="申请时间"
+        width="240"
+        :sortable="true"
+        prop="application_time"
+      >
         <template slot-scope="scope">
           <i class="el-icon-time" />
           <span>{{ scope.row.application_time }}</span>
         </template>
       </el-table-column>
       <el-table-column label="完成情况" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.finish_case }}
-        </template>
+        <template slot-scope="scope">{{ scope.row.finish_case }}</template>
       </el-table-column>
       <el-table-column label="操作" width="220" align="center">
         <template slot-scope="scope">
@@ -87,8 +86,13 @@
                     :autosize="{ minRows: 1, maxRows: 2}"
                   />
                 </el-form-item>
-                <el-form-item label="活动时间" :label-width="formLabelWidth">
-                  <el-date-picker v-model="form.application_time" type="datetime" placeholder="选择时间" style="width: 100%;" />
+                <el-form-item label="申请时间" :label-width="formLabelWidth">
+                  <el-date-picker
+                    v-model="form.application_time"
+                    type="datetime"
+                    placeholder="选择时间"
+                    style="width: 100%;"
+                  />
                 </el-form-item>
                 <el-form-item label="完成情况" :label-width="formLabelWidth" style="text-align:left">
                   <el-input v-model="form.finish_case" />
@@ -123,10 +127,13 @@
               </el-form>
               <div class="demo-drawer__footer">
                 <el-button @click="cancelForm">取 消</el-button>
-                <el-button type="primary" :loading="loading" @click="$refs.drawer.closeDrawer()">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
+                <el-button
+                  type="primary"
+                  :loading="loading"
+                  @click="$refs.drawer.closeDrawer()"
+                >{{ loading ? '提交中 ...' : '确 定' }}</el-button>
               </div>
             </div>
-
           </el-drawer>
           <transition name="el-zoom-in-center">
             <el-button type="primary" size="mini" @click="selectContent(scope.row)">查看</el-button>
@@ -134,7 +141,7 @@
           <span>
             <el-tooltip class="item" effect="dark" content="删除这一申请表" placement="top">
               <transition name="el-zoom-in-center">
-                <el-button size="mini" type="danger" @click="dialogVisible = true">删除</el-button>
+                <el-button size="mini" type="danger" @click="dialogVisible = true;form=scope.row">删除</el-button>
               </transition>
             </el-tooltip>
           </span>
@@ -142,12 +149,11 @@
             title="提示"
             :visible.sync="dialogVisible"
             width="30%"
-            :before-close="handleClose"
           >
             <span>确认永久删除该申请表吗？</span>
             <span slot="footer" class="dialog-footer">
               <el-button @click="dialogVisible = false">取 消</el-button>
-              <el-button type="primary" @click="handleDelete(scope.row)">确 定</el-button>
+              <el-button type="primary" @click="handleDelete(form)">确 定</el-button>
             </span>
           </el-dialog>
         </template>
@@ -166,13 +172,12 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />
-
     </div>
   </div>
 </template>
 
 <script>
-import { getScoreApplyList } from '@/api/table'
+import { scoreApplyUpdate, scoreApplyDelete, getScoreApplyList } from '@/api/table'
 
 export default {
   filters: {
@@ -187,14 +192,14 @@ export default {
   },
   data() {
     return {
-      dateTimeRange: [new Date(2020, 4, 1, 12, 0), new Date(2020, 4, 21, 12, 0)],
+      dateTimeRange: [],
       beginDate: '',
       endDate: '',
       search: '',
       select: '',
       dialogVisible: false,
       list: null,
-      searchList: this.list,
+      searchList: null,
       listLoading: true,
       total: 0,
       currentPage: 1,
@@ -232,7 +237,8 @@ export default {
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 7)
               picker.$emit('pick', [start, end])
             }
-          }, {
+          },
+          {
             text: '最近一个月',
             onClick(picker) {
               const end = new Date()
@@ -240,7 +246,8 @@ export default {
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 30)
               picker.$emit('pick', [start, end])
             }
-          }, {
+          },
+          {
             text: '最近三个月',
             onClick(picker) {
               const end = new Date()
@@ -248,8 +255,23 @@ export default {
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 90)
               picker.$emit('pick', [start, end])
             }
-          }]
+          }
+        ]
       }
+    }
+  },
+  watch: {
+    'dateTimeRange': function(dateTimeRange) {
+      this.searchList = this.searchList.filter(function(item) {
+        if (dateTimeRange) {
+          if (item[2] >= dateTimeRange[0].toLocaleString() && item[2] <= dateTimeRange[1].toLocaleString()) {
+            console.log(dateTimeRange[0].toLocaleString())
+            return true
+          } else {
+            return false
+          }
+        } else { return false }
+      })
     }
   },
   created() {
@@ -260,16 +282,19 @@ export default {
       this.listLoading = true
       getScoreApplyList().then(response => {
         this.list = response.data.items
+        this.searchList = response.data.items
         this.total = response.data.total
         this.listLoading = false
       })
 
       this.currentChangePage(this.list, this.currentPage)
     },
-    handleSizeChange(pageSize) { // 每页条数切换
+    handleSizeChange(pageSize) {
+      // 每页条数切换
       this.pageSize = pageSize
     },
-    handleCurrentChange(currentPage) { // 页码切换
+    handleCurrentChange(currentPage) {
+      // 页码切换
       this.currentPage = currentPage
     },
     selectContent(row) {
@@ -278,8 +303,14 @@ export default {
     },
     handleDelete(row) {
       this.dialogVisible = false
+      scoreApplyDelete(row).then(response => {
+        getScoreApplyList().then(response => {
+          this.list = response.data.items
+          this.total = response.data.total
+        })
+      })
     },
-    handleClose(done) {
+    handleClose() {
       if (this.loading) {
         return
       }
@@ -287,7 +318,12 @@ export default {
         .then(_ => {
           this.loading = true
           this.timer = setTimeout(() => {
-            done()
+            scoreApplyUpdate(this.form).then(response => {
+              getScoreApplyList().then(response => {
+                this.list = response.data.items
+                this.total = response.data.total
+              })
+            })
             // 动画关闭需要一定的时间
             setTimeout(() => {
               this.loading = false
@@ -301,8 +337,12 @@ export default {
       this.showDrawer = false
       clearTimeout(this.timer)
     },
-    SearchList() {
-      console.log(this.search)
+    SearchList(dateTimeRange, search, select) {
+      this.searchList = this.searchList.filter(function(item) {
+        return Object.keys(item).some(function(key) {
+          return String(item[select]).toLowerCase().indexOf(search) > -1
+        })
+      })
     },
     tableRowClassName({ row }) {
       if (row.application_state === 'draft') {
@@ -316,28 +356,28 @@ export default {
 }
 </script>
 <style>
-  .el-select .el-input {
-    width: 130px;
-  }
-  .input-with-select .el-input-group__prepend {
-    background-color: #fff;
-  }
-  .search-box{
-    display: flex;
-    justify-content:space-evenly;
-  }
-  .paginationClass .el-pagination{
-    text-align: right;
-  }
-  .line{
-    display: flex;
-    align-items: center;
-  }
-  .el-table .warning-row {
-    background: oldlace;
-  }
+.el-select .el-input {
+  width: 130px;
+}
+.input-with-select .el-input-group__prepend {
+  background-color: #fff;
+}
+.search-box {
+  display: flex;
+  justify-content: space-evenly;
+}
+.paginationClass .el-pagination {
+  text-align: right;
+}
+.line {
+  display: flex;
+  align-items: center;
+}
+.el-table .warning-row {
+  background: oldlace;
+}
 
-  .el-table .success-row {
-    background: #f0f9eb;
-  }
+.el-table .success-row {
+  background: #f0f9eb;
+}
 </style>

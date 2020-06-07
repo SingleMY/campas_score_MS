@@ -1,79 +1,114 @@
 <template>
-  <div class="app-container">
-    <el-table
-      v-loading="listLoading"
-      :data="list"
-      element-loading-text="Loading"
-      border
-      fit
-      highlight-current-row
-    >
-      <el-table-column align="center" label="ID" width="95">
-        <template slot-scope="scope">
-          {{ scope.$index }}
-        </template>
-      </el-table-column>
-      <el-table-column label="Title">
-        <template slot-scope="scope">
-          {{ scope.row.title }}
-        </template>
-      </el-table-column>
-      <el-table-column label="Author" width="110" align="center">
-        <template slot-scope="scope">
-          <span>{{ scope.row.author }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Pageviews" width="110" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.pageviews }}
-        </template>
-      </el-table-column>
-      <el-table-column class-name="status-col" label="Status" width="110" align="center">
-        <template slot-scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{ scope.row.status }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" prop="created_at" label="Display_time" width="200">
-        <template slot-scope="scope">
-          <i class="el-icon-time" />
-          <span>{{ scope.row.display_time }}</span>
-        </template>
-      </el-table-column>
-    </el-table>
-  </div>
+  <el-card shadow="hover" class="box-card">
+    <el-form :model="form" label-width="100px">
+      <el-form-item label="申请人" style="width:350px;margin-left:50px">
+        <el-input
+          v-model="form.user_id"
+          type="input"
+          :autosize="{ minRows: 1, maxRows: 2}"
+        />
+      </el-form-item>
+      <el-form-item label="活动ID" style="width:350px;margin-left:50px">
+        <el-input
+          v-model="form.activity_id"
+          type="input"
+          :autosize="{ minRows: 1, maxRows: 2}"
+        />
+      </el-form-item>
+      <el-form-item label="申请时间" style="width:350px;margin-left:50px;margin-left:50px">
+        <el-date-picker
+          v-model="form.application_time"
+          type="datetime"
+          placeholder="选择时间"
+          style="width: 100%;"
+        />
+      </el-form-item>
+      <el-form-item label="完成情况" style="width:250px;text-align:left;margin-left:50px">
+        <el-input v-model="form.finish_case" />
+      </el-form-item>
+      <el-form-item label="申请内容" style="text-align:left;margin:20px 150px 20px 50px">
+        <el-input
+          v-model="form.application_content"
+          type="textarea"
+          :autosize="{ minRows: 3, maxRows: 5}"
+        />
+      </el-form-item>
+      <el-form-item label="申请材料" style="text-align:left;margin:20px 150px 20px 50px">
+        <el-input
+          v-model="form.application_material"
+          type="textarea"
+          :autosize="{ minRows: 3, maxRows: 5}"
+        />
+      </el-form-item>
+      <el-form-item label="是否通过" style="text-align:left;margin:20px 150px 20px 50px">
+        <el-select v-model="form.application_state">
+          <el-option label="审核通过" value="examined" />
+          <el-option label="申请拒绝" value="refused" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="批注" style="text-align:left;margin:20px 150px 20px 50px">
+        <el-input
+          v-model="form.note"
+          type="textarea"
+          :autosize="{ minRows: 1, maxRows: 3}"
+        />
+      </el-form-item>
+    </el-form>
+    <div class="demo-drawer_footer">
+      <el-button @click="cancelForm">取 消</el-button>
+      <el-button
+        type="primary"
+        :loading="loading"
+        @click="Submit(form)"
+      >{{ loading ? '提交中 ...' : '确 定' }}</el-button>
+    </div>
+  </el-card>
 </template>
 
 <script>
-import { getList } from '@/api/table'
+import { scoreApplyAdd } from '@/api/submit'
 
 export default {
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'gray',
-        deleted: 'danger'
-      }
-      return statusMap[status]
-    }
-  },
   data() {
     return {
+      loading: false,
       list: null,
-      listLoading: true
+      form: {
+        user_id: '',
+        activity_id: '',
+        application_time: '',
+        finish_case: '',
+        application_content: '',
+        application_material: '',
+        application_state: '',
+        note: ''
+      }
+
     }
   },
-  created() {
-    this.fetchData()
-  },
   methods: {
-    fetchData() {
-      this.listLoading = true
-      getList().then(response => {
-        this.list = response.data.items
-        this.listLoading = false
+    Submit(form) {
+      this.loading = true
+      scoreApplyAdd(form).then(response => {
+        this.loading = false
+        this.open()
+      })
+    },
+    cancelForm() {
+      this.form = []
+    },
+    open() {
+      this.$notify({
+        title: '成功',
+        message: '添加成功',
+        type: 'success'
       })
     }
   }
 }
 </script>
+<style>
+.box-card{
+  margin: 30px;
+}
+</style>

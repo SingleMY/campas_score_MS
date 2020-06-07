@@ -1,85 +1,102 @@
 <template>
-  <div class="app-container">
-    <el-form ref="form" :model="form" label-width="120px">
-      <el-form-item label="Activity name">
-        <el-input v-model="form.name" />
-      </el-form-item>
-      <el-form-item label="Activity zone">
-        <el-select v-model="form.region" placeholder="please select your zone">
-          <el-option label="Zone one" value="shanghai" />
-          <el-option label="Zone two" value="beijing" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="Activity time">
-        <el-col :span="11">
-          <el-date-picker v-model="form.date1" type="date" placeholder="Pick a date" style="width: 100%;" />
-        </el-col>
-        <el-col :span="2" class="line">-</el-col>
-        <el-col :span="11">
-          <el-time-picker v-model="form.date2" type="fixed-time" placeholder="Pick a time" style="width: 100%;" />
-        </el-col>
-      </el-form-item>
-      <el-form-item label="Instant delivery">
-        <el-switch v-model="form.delivery" />
-      </el-form-item>
-      <el-form-item label="Activity type">
-        <el-checkbox-group v-model="form.type">
-          <el-checkbox label="Online activities" name="type" />
-          <el-checkbox label="Promotion activities" name="type" />
-          <el-checkbox label="Offline activities" name="type" />
-          <el-checkbox label="Simple brand exposure" name="type" />
-        </el-checkbox-group>
-      </el-form-item>
-      <el-form-item label="Resources">
-        <el-radio-group v-model="form.resource">
-          <el-radio label="Sponsor" />
-          <el-radio label="Venue" />
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="Activity form">
-        <el-input v-model="form.desc" type="textarea" />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="onSubmit">Create</el-button>
-        <el-button @click="onCancel">Cancel</el-button>
-      </el-form-item>
-    </el-form>
-  </div>
+  <el-card shadow="hover" class="box-card">
+    <div class="demo-drawer__content">
+      <el-form :model="form" label-width="100px">
+        <el-form-item label="活动ID" style="width:350px;margin-left:50px">
+          <el-input
+            v-model="form.activity_id"
+            type="input"
+            :autosize="{ minRows: 1, maxRows: 2}"
+          />
+        </el-form-item>
+        <el-form-item label="活动名称" style="width:450px;margin-left:50px">
+          <el-input
+            v-model="form.activity_name"
+            type="input"
+            :autosize="{ minRows: 1, maxRows: 2}"
+          />
+        </el-form-item>
+        <el-form-item label="开始时间" style="width:450px;margin-left:50px">
+          <el-date-picker
+            v-model="form.activity_begintime"
+            type="datetime"
+            placeholder="选择时间"
+            style="width: 100%;"
+          />
+        </el-form-item>
+        <el-form-item label="结束时间" style="width:450px;margin-left:50px">
+          <el-date-picker
+            v-model="form.activity_endtime"
+            type="datetime"
+            placeholder="选择时间"
+            style="width: 100%;"
+          />
+        </el-form-item>
+        <el-form-item label="活动成绩" style="width:250px;margin-left:50px">
+          <el-input v-model="form.score" />
+        </el-form-item>
+        <el-form-item label="活动描述" style="text-align:left;margin:20px 150px 20px 50px">
+          <el-input
+            v-model="form.activity_des"
+            type="textarea"
+            :autosize="{ minRows: 3, maxRows: 5}"
+          />
+        </el-form-item>
+      </el-form>
+      <div class="demo-drawer_footer">
+        <el-button @click="cancelForm">重 置</el-button>
+        <el-button
+          type="primary"
+          :loading="loading"
+          @click="Submit(form)"
+        >{{ loading ? '提交中 ...' : '确 定' }}</el-button>
+      </div>
+    </div>
+  </el-card>
 </template>
 
 <script>
+import { ActivityAdd } from '@/api/submit'
+
 export default {
   data() {
     return {
+      list: null,
       form: {
-        name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
+        activity_id: '',
+        activity_name: '',
+        activity_des: '',
+        activity_begintime: '',
+        activity_endtime: '',
+        score: ''
       }
+
     }
   },
   methods: {
-    onSubmit() {
-      this.$message('submit!')
+    Submit(form) {
+      ActivityAdd(form).then(response => {
+        this.open()
+      })
     },
-    onCancel() {
-      this.$message({
-        message: 'cancel!',
-        type: 'warning'
+    cancelForm() {
+      this.form = []
+    },
+    open() {
+      this.$notify({
+        title: '成功',
+        message: '添加成功',
+        type: 'success'
       })
     }
   }
 }
 </script>
-
-<style scoped>
-.line{
-  text-align: center;
+<style>
+.box-card{
+  margin: 30px;
+}
+.demo-drawer_footer{
+  margin-left:150px ;
 }
 </style>
-

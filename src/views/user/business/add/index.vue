@@ -1,85 +1,111 @@
 <template>
-  <div class="app-container">
-    <el-form ref="form" :model="form" label-width="120px">
-      <el-form-item label="Activity name">
-        <el-input v-model="form.name" />
+  <el-card shadow="hover" class="box-card">
+    <el-form :model="form" label-width="100px">
+      <el-form-item label="申请人" style="width:350px;margin-left:50px">
+        <el-input
+          v-model="form.user_id"
+          type="input"
+          :autosize="{ minRows: 1, maxRows: 2}"
+        />
       </el-form-item>
-      <el-form-item label="Activity zone">
-        <el-select v-model="form.region" placeholder="please select your zone">
-          <el-option label="Zone one" value="shanghai" />
-          <el-option label="Zone two" value="beijing" />
+      <el-form-item label="活动ID" style="width:350px;margin-left:50px">
+        <el-input
+          v-model="form.activity_id"
+          type="input"
+          :autosize="{ minRows: 1, maxRows: 2}"
+        />
+      </el-form-item>
+      <el-form-item label="申请时间" style="width:350px;margin-left:50px;margin-left:50px">
+        <el-date-picker
+          v-model="form.application_time"
+          type="datetime"
+          placeholder="选择时间"
+          style="width: 100%;"
+        />
+      </el-form-item>
+      <el-form-item label="完成情况" style="width:250px;text-align:left;margin-left:50px">
+        <el-input v-model="form.finish_case" />
+      </el-form-item>
+      <el-form-item label="申请内容" style="text-align:left;margin:20px 150px 20px 50px">
+        <el-input
+          v-model="form.application_content"
+          type="textarea"
+          :autosize="{ minRows: 3, maxRows: 5}"
+        />
+      </el-form-item>
+      <el-form-item label="申请材料" style="text-align:left;margin:20px 150px 20px 50px">
+        <el-input
+          v-model="form.application_material"
+          type="textarea"
+          :autosize="{ minRows: 3, maxRows: 5}"
+        />
+      </el-form-item>
+      <el-form-item label="是否通过" style="text-align:left;margin:20px 150px 20px 50px">
+        <el-select v-model="form.application_state">
+          <el-option label="审核通过" value="examined" />
+          <el-option label="申请拒绝" value="refused" />
         </el-select>
       </el-form-item>
-      <el-form-item label="Activity time">
-        <el-col :span="11">
-          <el-date-picker v-model="form.date1" type="date" placeholder="Pick a date" style="width: 100%;" />
-        </el-col>
-        <el-col :span="2" class="line">-</el-col>
-        <el-col :span="11">
-          <el-time-picker v-model="form.date2" type="fixed-time" placeholder="Pick a time" style="width: 100%;" />
-        </el-col>
-      </el-form-item>
-      <el-form-item label="Instant delivery">
-        <el-switch v-model="form.delivery" />
-      </el-form-item>
-      <el-form-item label="Activity type">
-        <el-checkbox-group v-model="form.type">
-          <el-checkbox label="Online activities" name="type" />
-          <el-checkbox label="Promotion activities" name="type" />
-          <el-checkbox label="Offline activities" name="type" />
-          <el-checkbox label="Simple brand exposure" name="type" />
-        </el-checkbox-group>
-      </el-form-item>
-      <el-form-item label="Resources">
-        <el-radio-group v-model="form.resource">
-          <el-radio label="Sponsor" />
-          <el-radio label="Venue" />
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="Activity form">
-        <el-input v-model="form.desc" type="textarea" />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="onSubmit">Create</el-button>
-        <el-button @click="onCancel">Cancel</el-button>
+      <el-form-item label="批注" style="text-align:left;margin:20px 150px 20px 50px">
+        <el-input
+          v-model="form.note"
+          type="textarea"
+          :autosize="{ minRows: 1, maxRows: 3}"
+        />
       </el-form-item>
     </el-form>
-  </div>
+    <div class="demo-drawer_footer">
+      <el-button @click="cancelForm">取 消</el-button>
+      <el-button
+        type="primary"
+        :loading="loading"
+        @click="Submit(form)"
+      >{{ loading ? '提交中 ...' : '确 定' }}</el-button>
+    </div>
+  </el-card>
 </template>
 
 <script>
+import { scoreApplyAdd } from '@/api/submit'
+
 export default {
   data() {
     return {
+      list: null,
       form: {
-        name: '',
-        region: '',
-        date1: '',
-        date2: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
+        user_id: '',
+        activity_id: '',
+        application_time: '',
+        finish_case: '',
+        application_content: '',
+        application_material: '',
+        application_state: '',
+        note: ''
       }
+
     }
   },
   methods: {
-    onSubmit() {
-      this.$message('submit!')
+    Submit(form) {
+      scoreApplyAdd(form).then(response => {
+        this.open()
+      })
     },
-    onCancel() {
-      this.$message({
-        message: 'cancel!',
-        type: 'warning'
+    cancelForm() {
+      this.form = []
+    },
+    open() {
+      this.$notify({
+        title: '成功',
+        message: '添加成功',
+        type: 'success'
       })
     }
   }
 }
 </script>
-
-<style scoped>
-.line{
-  text-align: center;
+<style>
+.box-card{
+  margin: 30px;
 }
 </style>
-

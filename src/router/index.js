@@ -72,7 +72,7 @@ export const constantRoutes = [
         path: 'examine',
         name: 'Examine',
         component: () => import('@/views/score/examine/index'),
-        meta: { title: '积分审核', icon: 'tree' }
+        meta: { title: '添加', icon: 'tree' }
       },
       {
         path: 'order',
