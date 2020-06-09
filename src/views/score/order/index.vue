@@ -209,6 +209,7 @@ export default {
       form: {
         user_id: '',
         activity_id: '',
+        itable_id: '',
         application_time: '',
         finish_case: '',
         application_content: '',

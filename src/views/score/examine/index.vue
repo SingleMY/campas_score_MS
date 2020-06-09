@@ -1,6 +1,13 @@
 <template>
   <el-card shadow="hover" class="box-card">
     <el-form :model="form" label-width="100px">
+      <el-form-item label="Index" style="width:350px;margin-left:50px">
+        <el-input
+          v-model="form.itable_id"
+          type="input"
+          :autosize="{ minRows: 1, maxRows: 2}"
+        />
+      </el-form-item>
       <el-form-item label="申请人" style="width:350px;margin-left:50px">
         <el-input
           v-model="form.user_id"
@@ -76,6 +83,7 @@ export default {
       form: {
         user_id: '',
         activity_id: '',
+        itable_id: '',
         application_time: '',
         finish_case: '',
         application_content: '',
