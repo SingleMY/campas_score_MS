@@ -105,12 +105,6 @@ export const constantRoutes = [
             meta: { title: '活动列表' }
           },
           {
-            path: 'apply',
-            component: () => import('@/views/system/activity/apply/index'),
-            name: 'Aapply',
-            meta: { title: '活动申请' }
-          },
-          {
             path: 'add',
             component: () => import('@/views/system/activity/add/index'),
             name: 'Aadd',
@@ -129,12 +123,6 @@ export const constantRoutes = [
             component: () => import('@/views/system/production/list/index'),
             name: 'Plist',
             meta: { title: '产品列表' }
-          },
-          {
-            path: 'apply',
-            component: () => import('@/views/system/production/apply/index'),
-            name: 'Papply',
-            meta: { title: '产品审核' }
           },
           {
             path: 'add',

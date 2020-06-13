@@ -17,9 +17,9 @@
       <div style="display:inline-block ;">
         <el-input v-model="search" placeholder="请输入内容" class="input-with-select">
           <el-select slot="prepend" v-model="select" placeholder="请选择">
-            <el-option label="申请人" value="user_id" />
-            <el-option label="活动" value="activity_id" />
-            <el-option label="完成情况" value="finish_case" />
+            <el-option label="交易人" value="user_id" />
+            <el-option label="订单号" value="tr_id" />
+            <el-option label="产品ID" value="p_id" />
           </el-select>
           <el-button slot="append" type="primary" icon="el-icon-search" @click="SearchList(dateTimeRange,search,select)" />
         </el-input>
@@ -30,37 +30,40 @@
       v-loading="listLoading"
       :data="searchList.slice((currentPage-1)*pageSize,currentPage*pageSize)"
       :row-class-name="tableRowClassName"
-      :default-sort="{prop: 'application_time', order: 'descending'}"
+      :default-sort="{prop: 'p_id', order: 'descending'}"
       element-loading-text="Loading"
       border
       fit
       highlight-current-row
     >
-      <el-table-column align="center" label="ID" width="80">
-        <template slot-scope="scope">{{ scope.$index+1 }}</template>
-      </el-table-column>
-      <el-table-column label="申请人" width="200" align="center" :sortable="true" prop="user_id">
-        <template slot-scope="scope">{{ scope.row.user_id }}</template>
-      </el-table-column>
-      <el-table-column label="活动ID" align="center" width="240" :sortable="true" prop="activity_id">
+      <el-table-column label="订单号" align="center" width="120" :sortable="true" prop="tr_id">
         <template slot-scope="scope">
-          <span>{{ scope.row.activity_id }}</span>
+          <span>{{ scope.row.tr_id }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="交易人" width="200" align="center" :sortable="true" prop="user_id">
+        <template slot-scope="scope">{{ scope.row.user_id }}</template>
+      </el-table-column>
+      <el-table-column label="产品ID" align="center" width="240" :sortable="true" prop="p_id">
+        <template slot-scope="scope">
+          <span>{{ scope.row.p_id }}</span>
+        </template>
+      </el-table-column>
+
       <el-table-column
         align="center"
-        label="申请时间"
+        label="交易时间"
         width="240"
         :sortable="true"
-        prop="application_time"
+        prop="tr_time"
       >
         <template slot-scope="scope">
           <i class="el-icon-time" />
-          <span>{{ scope.row.application_time }}</span>
+          <span>{{ scope.row.tr_time }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="完成情况" align="center">
-        <template slot-scope="scope">{{ scope.row.finish_case }}</template>
+      <el-table-column label="交易状态" align="center">
+        <template slot-scope="scope">{{ scope.row.state }}</template>
       </el-table-column>
       <el-table-column label="操作" width="220" align="center">
         <template slot-scope="scope">
@@ -72,57 +75,37 @@
           >
             <div class="demo-drawer__content">
               <el-form :model="form">
-                <el-form-item label="申请人" :label-width="formLabelWidth">
+                <el-form-item label="订单号" :label-width="formLabelWidth">
+                  <el-input
+                    v-model="form.tr_id"
+                    type="input"
+                    :autosize="{ minRows: 1, maxRows: 2}"
+                  />
+                </el-form-item>
+                <el-form-item label="产品ID" :label-width="formLabelWidth">
+                  <el-input
+                    v-model="form.p_id"
+                    type="input"
+                    :autosize="{ minRows: 1, maxRows: 2}"
+                  />
+                </el-form-item>
+                <el-form-item label="交易人" :label-width="formLabelWidth">
                   <el-input
                     v-model="form.user_id"
                     type="input"
                     :autosize="{ minRows: 1, maxRows: 2}"
                   />
                 </el-form-item>
-                <el-form-item label="活动ID" :label-width="formLabelWidth">
-                  <el-input
-                    v-model="form.activity_id"
-                    type="input"
-                    :autosize="{ minRows: 1, maxRows: 2}"
-                  />
-                </el-form-item>
-                <el-form-item label="申请时间" :label-width="formLabelWidth">
+                <el-form-item label="交易时间" :label-width="formLabelWidth">
                   <el-date-picker
-                    v-model="form.application_time"
+                    v-model="form.tr_time"
                     type="datetime"
                     placeholder="选择时间"
                     style="width: 100%;"
                   />
                 </el-form-item>
-                <el-form-item label="完成情况" :label-width="formLabelWidth" style="text-align:left">
-                  <el-input v-model="form.finish_case" />
-                </el-form-item>
-                <el-form-item label="申请内容" :label-width="formLabelWidth">
-                  <el-input
-                    v-model="form.application_content"
-                    type="textarea"
-                    :autosize="{ minRows: 3, maxRows: 5}"
-                  />
-                </el-form-item>
-                <el-form-item label="申请材料" :label-width="formLabelWidth">
-                  <el-input
-                    v-model="form.application_material"
-                    type="textarea"
-                    :autosize="{ minRows: 3, maxRows: 5}"
-                  />
-                </el-form-item>
-                <el-form-item label="是否通过" :label-width="formLabelWidth" style="text-align:left">
-                  <el-select v-model="form.application_state">
-                    <el-option label="审核通过" value="examined" />
-                    <el-option label="申请拒绝" value="refused" />
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="批注" :label-width="formLabelWidth">
-                  <el-input
-                    v-model="form.note"
-                    type="textarea"
-                    :autosize="{ minRows: 1, maxRows: 3}"
-                  />
+                <el-form-item label="交易状态" :label-width="formLabelWidth" style="text-align:left">
+                  <el-input v-model="form.state" />
                 </el-form-item>
               </el-form>
               <div class="demo-drawer__footer">
@@ -141,7 +124,7 @@
           <span>
             <el-tooltip class="item" effect="dark" content="删除这一申请表" placement="top">
               <transition name="el-zoom-in-center">
-                <el-button size="mini" type="danger" @click="dialogVisible = true">删除</el-button>
+                <el-button size="mini" type="danger" @click="dialogVisible = true;form=scope.row">删除</el-button>
               </transition>
             </el-tooltip>
           </span>
@@ -153,7 +136,7 @@
             <span>确认永久删除该申请表吗？</span>
             <span slot="footer" class="dialog-footer">
               <el-button @click="dialogVisible = false">取 消</el-button>
-              <el-button type="primary" @click="handleDelete(scope.row)">确 定</el-button>
+              <el-button type="primary" @click="handleDelete(form)">确 定</el-button>
             </span>
           </el-dialog>
         </template>
@@ -177,7 +160,7 @@
 </template>
 
 <script>
-import { scoreApplyUpdate, scoreApplyDelete, getScoreApplyList } from '@/api/table'
+import { OrderUpdate, OrderDelete, getOrderList } from '@/api/table'
 
 export default {
   filters: {
@@ -207,15 +190,11 @@ export default {
       showDrawer: false,
       loading: false,
       form: {
+        p_id: '',
         user_id: '',
-        activity_id: '',
-        itable_id: '',
-        application_time: '',
-        finish_case: '',
-        application_content: '',
-        application_material: '',
-        application_state: '',
-        note: ''
+        tr_id: '',
+        tr_time: '',
+        state: ''
       },
       formLabelWidth: '80px',
       timer: null,
@@ -281,7 +260,7 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true
-      getScoreApplyList().then(response => {
+      getOrderList().then(response => {
         this.list = response.data.items
         this.searchList = response.data.items
         this.total = response.data.total
@@ -304,8 +283,8 @@ export default {
     },
     handleDelete(row) {
       this.dialogVisible = false
-      scoreApplyDelete(row).then(response => {
-        getScoreApplyList().then(response => {
+      OrderDelete(row).then(response => {
+        getOrderList().then(response => {
           this.list = response.data.items
           this.total = response.data.total
         })
@@ -319,8 +298,8 @@ export default {
         .then(_ => {
           this.loading = true
           this.timer = setTimeout(() => {
-            scoreApplyUpdate(this.form).then(response => {
-              getScoreApplyList().then(response => {
+            OrderUpdate(this.form).then(response => {
+              getOrderList().then(response => {
                 this.list = response.data.items
                 this.total = response.data.total
               })

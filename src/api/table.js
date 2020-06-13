@@ -32,9 +32,33 @@ export function scoreApplyUpdate(data) {
   })
 }
 
+export function getOrderList(params) {
+  return request({
+    url: '/order/list',
+    method: 'get',
+    params
+  })
+}
+
+export function OrderDelete(data) {
+  return request({
+    url: '/order/delete',
+    method: 'post',
+    data
+  })
+}
+
+export function OrderUpdate(data) {
+  return request({
+    url: '/order/update',
+    method: 'post',
+    data
+  })
+}
+
 export function getActivityList(params) {
   return request({
-    url: '/activity/list',
+    url: '/activity',
     method: 'get',
     params
   })
@@ -57,7 +81,7 @@ export function ActivityDelete(data) {
 
 export function getProductionList(params) {
   return request({
-    url: '/production/list',
+    url: '/product',
     method: 'get',
     params
   })
@@ -80,7 +104,7 @@ export function ProductionDelete(data) {
 
 export function getStudentList(params) {
   return request({
-    url: '/student/list',
+    url: '/user',
     method: 'get',
     params
   })
@@ -103,7 +127,7 @@ export function StudentDelete(data) {
 
 export function getBusinessList(params) {
   return request({
-    url: '/business/list',
+    url: '/business',
     method: 'get',
     params
   })

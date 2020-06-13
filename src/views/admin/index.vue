@@ -34,7 +34,6 @@
 
 <script>
 import { EditAdmin, getMyInfor } from '@/api/submit'
-
 export default {
   data() {
     return {
@@ -54,7 +53,7 @@ export default {
   methods: {
     fetchData() {
       getMyInfor().then(response => {
-        this.form = response.data.items
+        this.form = response.data
       })
     },
     Submit(form) {

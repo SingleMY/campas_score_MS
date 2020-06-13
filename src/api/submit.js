@@ -34,7 +34,7 @@ export function UserAdd(data) {
 
 export function getMyInfor() {
   return request({
-    url: '/admin/infor',
+    url: '/user/info',
     method: 'get'
   })
 }

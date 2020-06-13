@@ -185,7 +185,7 @@ export default {
       const statusMap = {
         complete: 'success',
         draft: 'gray',
-        deleted: 'danger'
+        refused: 'danger'
       }
       return statusMap[status]
     }
