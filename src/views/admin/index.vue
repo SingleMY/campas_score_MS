@@ -53,6 +53,7 @@ export default {
   methods: {
     fetchData() {
       getMyInfor().then(response => {
+        console.log(response.data)
         this.form = response.data
       })
     },

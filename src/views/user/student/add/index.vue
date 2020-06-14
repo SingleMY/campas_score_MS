@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { scoreApplyAdd } from '@/api/submit'
+import { UserAdd } from '@/api/submit'
 
 export default {
   data() {
@@ -79,7 +79,7 @@ export default {
   },
   methods: {
     Submit(form) {
-      scoreApplyAdd(form).then(response => {
+      UserAdd(form).then(response => {
         this.open()
       })
     },

@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { scoreApplyAdd } from '@/api/submit'
+import { BusinessAdd } from '@/api/submit'
 
 export default {
   data() {
@@ -47,7 +47,7 @@ export default {
   },
   methods: {
     Submit(form) {
-      scoreApplyAdd(form).then(response => {
+      BusinessAdd(form).then(response => {
         this.open()
       })
     },

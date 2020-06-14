@@ -346,7 +346,7 @@ export default {
       })
     },
     tableRowClassName({ row }) {
-      if (row.application_state === 'draft') {
+      if (row.application_state === 'refused') {
         return 'warning-row'
       } else if (row.application_state === 'examined') {
         return 'success-row'

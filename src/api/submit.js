@@ -32,6 +32,14 @@ export function UserAdd(data) {
   })
 }
 
+export function BusinessAdd(data) {
+  return request({
+    url: '/business/add',
+    method: 'post',
+    data
+  })
+}
+
 export function getMyInfor() {
   return request({
     url: '/user/info',
